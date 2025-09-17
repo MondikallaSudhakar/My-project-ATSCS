@@ -6,7 +6,13 @@ interface HospitalMapProps {
   showRoute?: boolean;
   startLocation?: string;
   destinationLocation?: string;
-  onRouteUpdate?: (routeInfo: { distance: string; duration: string }) => void;
+  onRouteUpdate?: (routeInfo: { 
+    distance: string; 
+    duration: string; 
+    summary: string; 
+    startAddress: string; 
+    endAddress: string; 
+  }) => void;
 }
 
 export const HospitalMap = ({ showRoute = false, startLocation, destinationLocation, onRouteUpdate }: HospitalMapProps) => {
@@ -252,7 +258,14 @@ export const HospitalMap = ({ showRoute = false, startLocation, destinationLocat
           if (onRouteUpdate) {
             const distance = (route.distance / 1000).toFixed(1) + ' km';
             const duration = Math.ceil(route.duration / 60) + ' min';
-            onRouteUpdate({ distance, duration });
+            const summary = `${startLocation} → ${destinationLocation}`;
+            onRouteUpdate({ 
+              distance, 
+              duration, 
+              summary,
+              startAddress: startData[0].display_name || startLocation,
+              endAddress: endData[0].display_name || destinationLocation
+            });
           }
         }
       }

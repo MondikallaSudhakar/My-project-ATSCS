@@ -24,7 +24,13 @@ export const PickupFlow = ({ user, onBack, onAddNotification }: PickupFlowProps)
     emergency: "high"
   });
   const [routeActive, setRouteActive] = useState(false);
-  const [routeInfo, setRouteInfo] = useState({ distance: "5.2 km", duration: "8 min" });
+  const [routeInfo, setRouteInfo] = useState({ 
+    distance: "0 km", 
+    duration: "0 min",
+    summary: "",
+    startAddress: "",
+    endAddress: ""
+  });
   const { toast } = useToast();
 
   const handleVoiceInput = () => {
@@ -212,6 +218,16 @@ export const PickupFlow = ({ user, onBack, onAddNotification }: PickupFlowProps)
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
+                      <div className="space-y-2 border-b pb-3">
+                        <div className="flex justify-between items-start">
+                          <span className="text-sm font-medium">From:</span>
+                          <span className="text-sm text-right max-w-[200px]">{routeInfo.startAddress || formData.sourceLocation}</span>
+                        </div>
+                        <div className="flex justify-between items-start">
+                          <span className="text-sm font-medium">To:</span>
+                          <span className="text-sm text-right max-w-[200px]">{routeInfo.endAddress || formData.destinationLocation}</span>
+                        </div>
+                      </div>
                       <div className="flex justify-between">
                         <span>Distance</span>
                         <span className="font-bold">{routeInfo.distance}</span>
@@ -220,6 +236,12 @@ export const PickupFlow = ({ user, onBack, onAddNotification }: PickupFlowProps)
                         <span>ETA</span>
                         <span className="font-bold text-primary">{routeInfo.duration}</span>
                       </div>
+                      {routeInfo.summary && (
+                        <div className="flex justify-between">
+                          <span>Route</span>
+                          <span className="text-sm text-right max-w-[200px]">{routeInfo.summary}</span>
+                        </div>
+                      )}
                       <div className="flex justify-between">
                         <span>Signals Cleared</span>
                         <span className="font-bold text-green-600">4/4</span>
