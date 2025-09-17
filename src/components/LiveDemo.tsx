@@ -32,7 +32,17 @@ export const LiveDemo = ({ onBack }: LiveDemoProps) => {
     if (isPlaying) {
       interval = setInterval(() => {
         setAmbulancePosition(prev => {
-          const newPos = prev + 1;
+          // Check if ambulance should return (at 100% position)
+          if (prev >= 100) {
+            const newPos = prev - 1; // Move backwards
+            if (newPos <= 0) {
+              setIsPlaying(false);
+              return 0;
+            }
+            return newPos;
+          }
+          
+          const newPos = prev + 1; // Move forwards
           
           // Check if ambulance is approaching a signal (within 2km = 5% of progress)
           signals.forEach((signal, index) => {
@@ -48,12 +58,7 @@ export const LiveDemo = ({ onBack }: LiveDemoProps) => {
             }
           });
 
-          // Reset if reached the end
-          if (newPos >= 100) {
-            setIsPlaying(false);
-            return 0;
-          }
-          
+          // Continue to destination
           return newPos;
         });
       }, 100);

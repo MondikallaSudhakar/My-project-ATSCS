@@ -4,12 +4,16 @@ import "leaflet/dist/leaflet.css";
 
 interface HospitalMapProps {
   showRoute?: boolean;
+  startLocation?: string;
+  destinationLocation?: string;
+  onRouteUpdate?: (routeInfo: { distance: string; duration: string }) => void;
 }
 
-export const HospitalMap = ({ showRoute = false }: HospitalMapProps) => {
+export const HospitalMap = ({ showRoute = false, startLocation, destinationLocation, onRouteUpdate }: HospitalMapProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<L.Map | null>(null);
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
+  const routeLayer = useRef<L.Polyline | null>(null);
 
   useEffect(() => {
     if (!mapContainer.current) return;
@@ -123,34 +127,12 @@ export const HospitalMap = ({ showRoute = false }: HospitalMapProps) => {
           });
         });
 
-        // Show route if requested
-        if (showRoute) {
-          const routeCoordinates: [number, number][] = [
-            [lat, lng],
-            [13.5560, 78.8748],
-            [13.5570, 78.8758],
-            [13.5580, 78.8758] // Government Hospital
-          ];
-
-          const routeLine = L.polyline(routeCoordinates, {
-            color: '#ef4444',
-            weight: 5,
-            opacity: 0.8,
-            dashArray: '10, 10'
-          }).addTo(map.current!);
-
-          // Add ambulance icon on route
-          const ambulanceIcon = L.divIcon({
-            html: '<div style="font-size: 24px;">🚑</div>',
-            iconSize: [30, 30],
-            className: 'ambulance-marker'
-          });
-
-          L.marker([lat + 0.001, lng + 0.001], { icon: ambulanceIcon })
-            .addTo(map.current!)
-            .bindPopup("🚑 Emergency Vehicle - AP01-AB-1234");
-
-          map.current!.fitBounds(routeLine.getBounds(), { padding: [20, 20] });
+        // Show route if requested and locations provided
+        if (showRoute && startLocation && destinationLocation) {
+          showDynamicRoute(lat, lng);
+        } else if (showRoute) {
+          // Fallback to default route if no specific locations provided
+          showDefaultRoute(lat, lng);
         }
       },
       (error) => {
@@ -188,7 +170,132 @@ export const HospitalMap = ({ showRoute = false }: HospitalMapProps) => {
         map.current.remove();
       }
     };
-  }, [showRoute]);
+  }, [showRoute, startLocation, destinationLocation]);
+
+  const showDynamicRoute = async (userLat: number, userLng: number) => {
+    if (!startLocation || !destinationLocation) return;
+
+    try {
+      // Get coordinates for start location
+      const startRes = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(startLocation)}`);
+      const startData = await startRes.json();
+      
+      // Get coordinates for destination
+      const endRes = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(destinationLocation)}`);
+      const endData = await endRes.json();
+
+      if (startData.length && endData.length) {
+        const startCoords = [parseFloat(startData[0].lat), parseFloat(startData[0].lon)];
+        const endCoords = [parseFloat(endData[0].lat), parseFloat(endData[0].lon)];
+
+        // Fetch route from OSRM
+        const routeRes = await fetch(
+          `https://router.project-osrm.org/route/v1/driving/${startCoords[1]},${startCoords[0]};${endCoords[1]},${endCoords[0]}?overview=full&geometries=geojson`
+        );
+        const routeData = await routeRes.json();
+
+        if (routeData.routes && routeData.routes.length > 0) {
+          const route = routeData.routes[0];
+          const coords = route.geometry.coordinates.map((c: [number, number]) => [c[1], c[0]]);
+
+          // Remove existing route
+          if (routeLayer.current) {
+            map.current!.removeLayer(routeLayer.current);
+          }
+
+          // Add new route
+          routeLayer.current = L.polyline(coords, {
+            color: '#ef4444',
+            weight: 5,
+            opacity: 0.8,
+            dashArray: '10, 10'
+          }).addTo(map.current!);
+
+          // Add start marker
+          const startIcon = L.divIcon({
+            html: '<div style="background: #22c55e; color: white; border-radius: 50%; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; font-size: 12px; border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">S</div>',
+            iconSize: [25, 25],
+            className: 'start-marker'
+          });
+
+          L.marker(startCoords as [number, number], { icon: startIcon })
+            .addTo(map.current!)
+            .bindPopup(`📍 Start: ${startLocation}`);
+
+          // Add destination marker
+          const endIcon = L.divIcon({
+            html: '<div style="background: #dc2626; color: white; border-radius: 50%; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; font-size: 12px; border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">D</div>',
+            iconSize: [25, 25],
+            className: 'destination-marker'
+          });
+
+          L.marker(endCoords as [number, number], { icon: endIcon })
+            .addTo(map.current!)
+            .bindPopup(`🏁 Destination: ${destinationLocation}`);
+
+          // Add ambulance icon on route
+          const ambulanceIcon = L.divIcon({
+            html: '<div style="font-size: 24px;">🚑</div>',
+            iconSize: [30, 30],
+            className: 'ambulance-marker'
+          });
+
+          const midPoint = coords[Math.floor(coords.length / 2)];
+          L.marker(midPoint, { icon: ambulanceIcon })
+            .addTo(map.current!)
+            .bindPopup("🚑 Emergency Vehicle - AP01-AB-1234");
+
+          // Fit bounds to show entire route
+          map.current!.fitBounds(routeLayer.current.getBounds(), { padding: [20, 20] });
+
+          // Update route info
+          if (onRouteUpdate) {
+            const distance = (route.distance / 1000).toFixed(1) + ' km';
+            const duration = Math.ceil(route.duration / 60) + ' min';
+            onRouteUpdate({ distance, duration });
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching route:', error);
+      // Fallback to default route
+      showDefaultRoute(userLat, userLng);
+    }
+  };
+
+  const showDefaultRoute = (lat: number, lng: number) => {
+    const routeCoordinates: [number, number][] = [
+      [lat, lng],
+      [13.5560, 78.8748],
+      [13.5570, 78.8758],
+      [13.5580, 78.8758] // Government Hospital
+    ];
+
+    // Remove existing route
+    if (routeLayer.current) {
+      map.current!.removeLayer(routeLayer.current);
+    }
+
+    routeLayer.current = L.polyline(routeCoordinates, {
+      color: '#ef4444',
+      weight: 5,
+      opacity: 0.8,
+      dashArray: '10, 10'
+    }).addTo(map.current!);
+
+    // Add ambulance icon on route
+    const ambulanceIcon = L.divIcon({
+      html: '<div style="font-size: 24px;">🚑</div>',
+      iconSize: [30, 30],
+      className: 'ambulance-marker'
+    });
+
+    L.marker([lat + 0.001, lng + 0.001], { icon: ambulanceIcon })
+      .addTo(map.current!)
+      .bindPopup("🚑 Emergency Vehicle - AP01-AB-1234");
+
+    map.current!.fitBounds(routeLayer.current.getBounds(), { padding: [20, 20] });
+  };
 
   const calculateDistance = (lat1: number, lng1: number, lat2: number, lng2: number) => {
     const R = 6371; // Earth's radius in km

@@ -24,6 +24,7 @@ export const PickupFlow = ({ user, onBack, onAddNotification }: PickupFlowProps)
     emergency: "high"
   });
   const [routeActive, setRouteActive] = useState(false);
+  const [routeInfo, setRouteInfo] = useState({ distance: "5.2 km", duration: "8 min" });
   const { toast } = useToast();
 
   const handleVoiceInput = () => {
@@ -194,7 +195,12 @@ export const PickupFlow = ({ user, onBack, onAddNotification }: PickupFlowProps)
                     <CardTitle>Live Route Map</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <HospitalMap showRoute={true} />
+                    <HospitalMap 
+                      showRoute={true} 
+                      startLocation={formData.sourceLocation}
+                      destinationLocation={formData.destinationLocation}
+                      onRouteUpdate={setRouteInfo}
+                    />
                   </CardContent>
                 </Card>
               </div>
@@ -208,11 +214,11 @@ export const PickupFlow = ({ user, onBack, onAddNotification }: PickupFlowProps)
                     <div className="space-y-3">
                       <div className="flex justify-between">
                         <span>Distance</span>
-                        <span className="font-bold">5.2 km</span>
+                        <span className="font-bold">{routeInfo.distance}</span>
                       </div>
                       <div className="flex justify-between">
                         <span>ETA</span>
-                        <span className="font-bold text-primary">8 min</span>
+                        <span className="font-bold text-primary">{routeInfo.duration}</span>
                       </div>
                       <div className="flex justify-between">
                         <span>Signals Cleared</span>

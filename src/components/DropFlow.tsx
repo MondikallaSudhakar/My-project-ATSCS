@@ -31,6 +31,7 @@ export const DropFlow = ({ user, onBack, onAddNotification }: DropFlowProps) => 
     specialCare: ""
   });
   const [routeActive, setRouteActive] = useState(false);
+  const [routeInfo, setRouteInfo] = useState({ distance: "", duration: "" });
   const { toast } = useToast();
 
   useEffect(() => {
@@ -259,7 +260,12 @@ export const DropFlow = ({ user, onBack, onAddNotification }: DropFlowProps) => 
                     <CardTitle>Live Route to Hospital</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <HospitalMap showRoute={true} />
+                    <HospitalMap 
+                      showRoute={true} 
+                      startLocation={formData.currentLocation}
+                      destinationLocation={selectedHospital?.name}
+                      onRouteUpdate={setRouteInfo}
+                    />
                   </CardContent>
                 </Card>
               </div>
@@ -273,11 +279,11 @@ export const DropFlow = ({ user, onBack, onAddNotification }: DropFlowProps) => 
                     <div className="space-y-3">
                       <div className="flex justify-between">
                         <span>Distance</span>
-                        <span className="font-bold">{selectedHospital.distance}</span>
+                        <span className="font-bold">{routeInfo.distance || selectedHospital.distance}</span>
                       </div>
                       <div className="flex justify-between">
                         <span>ETA</span>
-                        <span className="font-bold text-blue-600">{selectedHospital.eta}</span>
+                        <span className="font-bold text-blue-600">{routeInfo.duration || selectedHospital.eta}</span>
                       </div>
                       <div className="flex justify-between">
                         <span>Hospital Notified</span>
