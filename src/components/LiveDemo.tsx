@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Play, Pause, RotateCcw, MapPin, Clock } from "lucide-react";
+import ambulanceIcon from "@/assets/ambulance-icon.png";
 
 interface LiveDemoProps {
   onBack: () => void;
@@ -187,8 +188,15 @@ export const LiveDemo = ({ onBack }: LiveDemoProps) => {
                   className="absolute top-1/2 transform -translate-y-1/2 transition-all duration-300"
                   style={{ left: `${15 + ambulancePosition * 0.7}%` }}
                 >
-                  <div className={`text-2xl ambulance-icon ${ambulancePosition >= 100 ? 'scale-x-[-1]' : ''}`}>🚑</div>
-                  <div className="text-xs font-bold text-center mt-1">AP01-AB-1234</div>
+                  <div className="flex flex-col items-center">
+                    <img 
+                      src={ambulanceIcon} 
+                      alt="Ambulance" 
+                      className="w-8 h-4 object-contain"
+                      style={{ transform: ambulancePosition >= 100 ? 'scaleX(-1)' : 'none' }}
+                    />
+                    <div className="text-xs font-bold text-center mt-1">AP01-AB-1234</div>
+                  </div>
                 </div>
 
                 {/* Start and End Points */}

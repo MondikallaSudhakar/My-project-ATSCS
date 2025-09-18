@@ -301,18 +301,38 @@ export const PickupFlow = ({ user, onBack, onAddNotification }: PickupFlowProps)
                             <span className="text-xs text-green-600">Clear</span>
                           </div>
                         </div>
-                      )) : ["Market Circle", "RS Colony", "Hospital Junction"].map((signal, idx) => (
-                        <div key={signal} className="flex items-center justify-between">
-                          <span className="text-sm">{signal}</span>
-                          <div className="flex items-center">
-                            <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
-                            <span className="text-xs text-green-600">Clear</span>
-                          </div>
+                      )) : (
+                        <div className="text-center text-sm text-muted-foreground py-4">
+                          <p>Select route to see signals</p>
                         </div>
-                      ))}
+                      )}
                     </div>
                   </CardContent>
                 </Card>
+
+                {/* Step-by-step Route Display */}
+                {routeInfo.steps && routeInfo.steps.length > 0 && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Route Steps</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium text-primary">
+                          Route: {routeInfo.steps.join(' → ')}
+                        </p>
+                        <div className="space-y-1">
+                          {routeInfo.steps.map((step, index) => (
+                            <div key={index} className="flex items-center text-xs text-muted-foreground">
+                              <div className="w-2 h-2 bg-primary rounded-full mr-2"></div>
+                              <span>{index + 1}. {step}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
 
                 <Button 
                   onClick={handleCompleteTrip}

@@ -276,14 +276,51 @@ export const HospitalMap = ({ showRoute = false, startLocation, destinationLocat
               });
             }
             
-            // Fallback signals if none found
-            if (signals.length === 0) {
-              signals.push("Market Circle", "RS Colony", "Hospital Junction");
+            // Generate dynamic route steps and signals based on start and end locations
+            const dynamicSteps = [];
+            const dynamicSignals = [];
+            
+            // Add start location
+            dynamicSteps.push(startLocation);
+            
+            // Generate intermediate signals based on route distance
+            const routeDistanceKm = route.distance / 1000;
+            if (routeDistanceKm > 5) {
+              // For longer routes, add intermediate signals
+              if (startLocation.toLowerCase().includes('angallu') || destinationLocation.toLowerCase().includes('angallu')) {
+                if (destinationLocation.toLowerCase().includes('kurnool') || startLocation.toLowerCase().includes('kurnool')) {
+                  dynamicSteps.push('Madanapalle Junction', 'NH 40 Signal', 'Kurnool Entry');
+                  dynamicSignals.push('Madanapalle Junction', 'NH 40 Signal');
+                } else if (destinationLocation.toLowerCase().includes('kadiri') || startLocation.toLowerCase().includes('kadiri')) {
+                  dynamicSteps.push('Madanapalle Circle', 'Kadiri Signal');
+                  dynamicSignals.push('Madanapalle Circle');
+                } else {
+                  dynamicSteps.push('Main Junction', 'Central Signal');
+                  dynamicSignals.push('Main Junction');
+                }
+              } else if (startLocation.toLowerCase().includes('bus stand') || destinationLocation.toLowerCase().includes('hospital')) {
+                dynamicSteps.push('Market Circle', 'RS Colony', 'Hospital Junction');
+                dynamicSignals.push('Market Circle', 'RS Colony');
+              } else {
+                // Generic intermediate points
+                const midPoint = `${startLocation.split(' ')[0]} Circle`;
+                const finalSignal = `${destinationLocation.split(' ')[0]} Junction`;
+                dynamicSteps.push(midPoint, finalSignal);
+                dynamicSignals.push(midPoint);
+              }
+            } else {
+              // For shorter routes
+              const signal = `${startLocation.split(' ')[0]}-${destinationLocation.split(' ')[0]} Signal`;
+              dynamicSteps.push(signal);
+              dynamicSignals.push(signal);
             }
             
-            // Fallback steps if none found
-            if (steps.length === 0) {
-              steps.push("Head towards destination", "Continue on main road", "Arrive at destination");
+            // Add end location
+            dynamicSteps.push(destinationLocation);
+            
+            // Fallback signals if none found
+            if (dynamicSignals.length === 0) {
+              dynamicSignals.push("Market Circle", "RS Colony", "Hospital Junction");
             }
             
             onRouteUpdate({ 
@@ -292,8 +329,8 @@ export const HospitalMap = ({ showRoute = false, startLocation, destinationLocat
               summary,
               startAddress: startData[0].display_name || startLocation,
               endAddress: endData[0].display_name || destinationLocation,
-              signals,
-              steps
+              signals: dynamicSignals,
+              steps: dynamicSteps
             });
           }
         }
