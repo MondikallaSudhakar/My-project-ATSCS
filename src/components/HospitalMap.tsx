@@ -12,6 +12,8 @@ interface HospitalMapProps {
     summary: string; 
     startAddress: string; 
     endAddress: string; 
+    signals: string[];
+    steps: string[];
   }) => void;
 }
 
@@ -259,12 +261,39 @@ export const HospitalMap = ({ showRoute = false, startLocation, destinationLocat
             const distance = (route.distance / 1000).toFixed(1) + ' km';
             const duration = Math.ceil(route.duration / 60) + ' min';
             const summary = `${startLocation} → ${destinationLocation}`;
+            
+            // Generate dynamic signals based on route
+            const signals = [];
+            const steps = [];
+            if (route.legs && route.legs[0] && route.legs[0].steps) {
+              route.legs[0].steps.forEach((step: any, index: number) => {
+                if (step.maneuver && step.maneuver.type === 'turn') {
+                  signals.push(`Signal ${index + 1} - ${step.name || `Junction ${index + 1}`}`);
+                }
+                if (step.name) {
+                  steps.push(`${index + 1}. ${step.name}`);
+                }
+              });
+            }
+            
+            // Fallback signals if none found
+            if (signals.length === 0) {
+              signals.push("Market Circle", "RS Colony", "Hospital Junction");
+            }
+            
+            // Fallback steps if none found
+            if (steps.length === 0) {
+              steps.push("Head towards destination", "Continue on main road", "Arrive at destination");
+            }
+            
             onRouteUpdate({ 
               distance, 
               duration, 
               summary,
               startAddress: startData[0].display_name || startLocation,
-              endAddress: endData[0].display_name || destinationLocation
+              endAddress: endData[0].display_name || destinationLocation,
+              signals,
+              steps
             });
           }
         }

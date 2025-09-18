@@ -29,7 +29,9 @@ export const PickupFlow = ({ user, onBack, onAddNotification }: PickupFlowProps)
     duration: "0 min",
     summary: "",
     startAddress: "",
-    endAddress: ""
+    endAddress: "",
+    signals: [] as string[],
+    steps: [] as string[]
   });
   const { toast } = useToast();
 
@@ -182,15 +184,50 @@ export const PickupFlow = ({ user, onBack, onAddNotification }: PickupFlowProps)
 
         {currentStep === "route" && (
           <div className="space-y-6">
-            <Card className="border-primary bg-red-50">
-              <CardContent className="p-4">
-                <div className="flex items-center">
-                  <div className="bg-primary rounded-full w-3 h-3 mr-3 pulse-emergency"></div>
+            {/* Notification Section - Separate from route display */}
+            <div className="fixed top-4 right-4 z-50 max-w-sm space-y-2">
+              <Card className="border-primary bg-red-50 shadow-lg">
+                <CardContent className="p-4">
+                  <div className="flex items-center">
+                    <div className="bg-primary rounded-full w-3 h-3 mr-3 pulse-emergency"></div>
+                    <div>
+                      <h3 className="font-bold text-primary">Emergency Route Active</h3>
+                      <p className="text-sm">Route: {formData.sourceLocation} → {formData.destinationLocation}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Address Information Section */}
+            <Card className="bg-blue-50 border-blue-200">
+              <CardHeader>
+                <CardTitle className="text-blue-800">Route Information</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <h3 className="font-bold text-primary">Emergency Route Active</h3>
-                    <p className="text-sm">Route: {formData.sourceLocation} → {formData.destinationLocation}</p>
+                    <p className="text-sm font-medium text-blue-700">From:</p>
+                    <p className="text-sm text-blue-900">{routeInfo.startAddress || formData.sourceLocation}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-blue-700">To:</p>
+                    <p className="text-sm text-blue-900">{routeInfo.endAddress || formData.destinationLocation}</p>
                   </div>
                 </div>
+                {routeInfo.steps && routeInfo.steps.length > 0 && (
+                  <div className="mt-4">
+                    <p className="text-sm font-medium text-blue-700 mb-2">Route Steps:</p>
+                    <div className="space-y-1">
+                      {routeInfo.steps.map((step, index) => (
+                        <div key={index} className="flex items-center text-xs text-blue-800">
+                          <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
+                          <span>{step}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
@@ -256,7 +293,15 @@ export const PickupFlow = ({ user, onBack, onAddNotification }: PickupFlowProps)
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2">
-                      {["Market Circle", "RS Colony", "Hospital Junction"].map((signal, idx) => (
+                      {routeInfo.signals?.length > 0 ? routeInfo.signals.map((signal, idx) => (
+                        <div key={signal} className="flex items-center justify-between">
+                          <span className="text-sm">{signal}</span>
+                          <div className="flex items-center">
+                            <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+                            <span className="text-xs text-green-600">Clear</span>
+                          </div>
+                        </div>
+                      )) : ["Market Circle", "RS Colony", "Hospital Junction"].map((signal, idx) => (
                         <div key={signal} className="flex items-center justify-between">
                           <span className="text-sm">{signal}</span>
                           <div className="flex items-center">

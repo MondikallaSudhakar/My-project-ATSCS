@@ -31,7 +31,15 @@ export const DropFlow = ({ user, onBack, onAddNotification }: DropFlowProps) => 
     specialCare: ""
   });
   const [routeActive, setRouteActive] = useState(false);
-  const [routeInfo, setRouteInfo] = useState({ distance: "", duration: "" });
+  const [routeInfo, setRouteInfo] = useState({ 
+    distance: "", 
+    duration: "", 
+    summary: "",
+    startAddress: "",
+    endAddress: "",
+    signals: [] as string[],
+    steps: [] as string[]
+  });
   const { toast } = useToast();
 
   useEffect(() => {
@@ -241,15 +249,50 @@ export const DropFlow = ({ user, onBack, onAddNotification }: DropFlowProps) => 
 
         {currentStep === "route" && selectedHospital && (
           <div className="space-y-6">
-            <Card className="border-blue-500 bg-blue-50">
-              <CardContent className="p-4">
-                <div className="flex items-center">
-                  <div className="bg-blue-500 rounded-full w-3 h-3 mr-3 pulse-emergency"></div>
+            {/* Notification Section - Separate from route display */}
+            <div className="fixed top-4 right-4 z-50 max-w-sm">
+              <Card className="border-blue-500 bg-blue-50 shadow-lg">
+                <CardContent className="p-4">
+                  <div className="flex items-center">
+                    <div className="bg-blue-500 rounded-full w-3 h-3 mr-3 pulse-emergency"></div>
+                    <div>
+                      <h3 className="font-bold text-blue-800">Hospital Drop Route Active</h3>
+                      <p className="text-sm">Destination: {selectedHospital.name}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Address Information Section */}
+            <Card className="bg-green-50 border-green-200">
+              <CardHeader>
+                <CardTitle className="text-green-800">Route to Hospital</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <h3 className="font-bold text-blue-800">Hospital Drop Route Active</h3>
-                    <p className="text-sm">Destination: {selectedHospital.name}</p>
+                    <p className="text-sm font-medium text-green-700">From:</p>
+                    <p className="text-sm text-green-900">{routeInfo.startAddress || formData.currentLocation}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-green-700">To:</p>
+                    <p className="text-sm text-green-900">{routeInfo.endAddress || selectedHospital.name}</p>
                   </div>
                 </div>
+                {routeInfo.steps && routeInfo.steps.length > 0 && (
+                  <div className="mt-4">
+                    <p className="text-sm font-medium text-green-700 mb-2">Route Steps:</p>
+                    <div className="space-y-1">
+                      {routeInfo.steps.map((step, index) => (
+                        <div key={index} className="flex items-center text-xs text-green-800">
+                          <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                          <span>{step}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
 

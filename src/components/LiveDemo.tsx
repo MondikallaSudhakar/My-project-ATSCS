@@ -187,7 +187,7 @@ export const LiveDemo = ({ onBack }: LiveDemoProps) => {
                   className="absolute top-1/2 transform -translate-y-1/2 transition-all duration-300"
                   style={{ left: `${15 + ambulancePosition * 0.7}%` }}
                 >
-                  <div className="text-2xl ambulance-icon">🚑</div>
+                  <div className={`text-2xl ambulance-icon ${ambulancePosition >= 100 ? 'scale-x-[-1]' : ''}`}>🚑</div>
                   <div className="text-xs font-bold text-center mt-1">AP01-AB-1234</div>
                 </div>
 
