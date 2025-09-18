@@ -192,7 +192,7 @@ export const LiveDemo = ({ onBack }: LiveDemoProps) => {
                     <img 
                       src={ambulanceIcon} 
                       alt="Ambulance" 
-                      className="w-8 h-4 object-contain"
+                      className="w-12 h-6 object-contain"
                       style={{ transform: ambulancePosition >= 100 ? 'scaleX(-1)' : 'none' }}
                     />
                     <div className="text-xs font-bold text-center mt-1">AP01-AB-1234</div>

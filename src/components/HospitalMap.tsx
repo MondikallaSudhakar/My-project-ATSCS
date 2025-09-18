@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import ambulanceImage from "@/assets/ambulance-icon.png";
 
 interface HospitalMapProps {
   showRoute?: boolean;
@@ -242,14 +243,14 @@ export const HospitalMap = ({ showRoute = false, startLocation, destinationLocat
             .bindPopup(`🏁 Destination: ${destinationLocation}`);
 
           // Add ambulance icon on route
-          const ambulanceIcon = L.divIcon({
-            html: '<div style="font-size: 24px;">🚑</div>',
-            iconSize: [30, 30],
+          const ambulanceMarkerIcon = L.divIcon({
+            html: `<img src="${ambulanceImage}" style="width: 32px; height: 16px; object-fit: contain;" alt="Ambulance" />`,
+            iconSize: [32, 16],
             className: 'ambulance-marker'
           });
 
           const midPoint = coords[Math.floor(coords.length / 2)];
-          L.marker(midPoint, { icon: ambulanceIcon })
+          L.marker(midPoint, { icon: ambulanceMarkerIcon })
             .addTo(map.current!)
             .bindPopup("🚑 Emergency Vehicle - AP01-AB-1234");
 
@@ -286,17 +287,20 @@ export const HospitalMap = ({ showRoute = false, startLocation, destinationLocat
             // Generate intermediate signals based on route distance
             const routeDistanceKm = route.distance / 1000;
             if (routeDistanceKm > 5) {
-              // For longer routes, add intermediate signals
+              // For longer routes, add comprehensive intermediate signals
               if (startLocation.toLowerCase().includes('angallu') || destinationLocation.toLowerCase().includes('angallu')) {
                 if (destinationLocation.toLowerCase().includes('kurnool') || startLocation.toLowerCase().includes('kurnool')) {
-                  dynamicSteps.push('Madanapalle Junction', 'NH 40 Signal', 'Kurnool Entry');
-                  dynamicSignals.push('Madanapalle Junction', 'NH 40 Signal');
+                  dynamicSteps.push('Madanapalle Junction', 'Chittoor Bypass', 'Punganur Signal', 'Pakala Junction', 'Renigunta Circle', 'NH 40 Signal', 'Anantapur Entry', 'Dharmavaram Signal', 'Kurnool Entry');
+                  dynamicSignals.push('Madanapalle Junction', 'Chittoor Bypass', 'Punganur Signal', 'Pakala Junction', 'Renigunta Circle', 'NH 40 Signal', 'Anantapur Entry', 'Dharmavaram Signal');
                 } else if (destinationLocation.toLowerCase().includes('kadiri') || startLocation.toLowerCase().includes('kadiri')) {
-                  dynamicSteps.push('Madanapalle Circle', 'Kadiri Signal');
-                  dynamicSignals.push('Madanapalle Circle');
+                  dynamicSteps.push('Madanapalle Circle', 'Renigunta Signal', 'Puttur Junction', 'Kadiri Signal');
+                  dynamicSignals.push('Madanapalle Circle', 'Renigunta Signal', 'Puttur Junction');
+                } else if (destinationLocation.toLowerCase().includes('madanapalle') || startLocation.toLowerCase().includes('madanapalle')) {
+                  dynamicSteps.push('Village Junction', 'Highway Signal', 'Madanapalle Entry');
+                  dynamicSignals.push('Village Junction', 'Highway Signal');
                 } else {
-                  dynamicSteps.push('Main Junction', 'Central Signal');
-                  dynamicSignals.push('Main Junction');
+                  dynamicSteps.push('Main Junction', 'Highway Signal', 'Central Signal');
+                  dynamicSignals.push('Main Junction', 'Highway Signal');
                 }
               } else if (startLocation.toLowerCase().includes('bus stand') || destinationLocation.toLowerCase().includes('hospital')) {
                 dynamicSteps.push('Market Circle', 'RS Colony', 'Hospital Junction');
