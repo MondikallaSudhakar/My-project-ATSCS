@@ -28,7 +28,7 @@ export const LiveDemo = ({ onBack }: LiveDemoProps) => {
   ]);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval>;
     
     if (isPlaying) {
       interval = setInterval(() => {
