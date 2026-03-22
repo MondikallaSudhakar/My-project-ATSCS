@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { TrafficCone, LogOut, AlertTriangle, CheckCircle, Activity, MapPin } from "lucide-react";
 import { User } from "@/pages/Index";
+import { AmbulanceTracker } from "./AmbulanceTracker";
 
 interface TrafficDashboardProps {
   user: User;
@@ -95,6 +96,11 @@ export const TrafficDashboard = ({ user, onLogout, notifications }: TrafficDashb
             </CardContent>
           </Card>
         )}
+
+        {/* Ambulance Communication Panel */}
+        <div className="mb-6">
+          <AmbulanceTracker />
+        </div>
 
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Traffic Light Control */}
