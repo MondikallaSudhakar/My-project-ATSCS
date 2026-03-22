@@ -97,6 +97,11 @@ export const TrafficDashboard = ({ user, onLogout, notifications }: TrafficDashb
           </Card>
         )}
 
+        {/* Ambulance Communication Panel */}
+        <div className="mb-6">
+          <AmbulanceTracker />
+        </div>
+
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Traffic Light Control */}
           <div className="lg:col-span-2">
