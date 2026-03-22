@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { TrafficCone, LogOut, AlertTriangle, CheckCircle, Activity, MapPin } from "lucide-react";
 import { User } from "@/pages/Index";
+import { AmbulanceTracker } from "./AmbulanceTracker";
 
 interface TrafficDashboardProps {
   user: User;
