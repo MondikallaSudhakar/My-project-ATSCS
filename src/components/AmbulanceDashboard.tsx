@@ -160,6 +160,11 @@ export const AmbulanceDashboard = ({ user, onNavigate, onLogout }: AmbulanceDash
           </Card>
         </div>
 
+        {/* Live Ambulance Map */}
+        <div className="mt-6">
+          <LiveAmbulanceMap vehicleId={vehicleId || undefined} isEmergency={true} />
+        </div>
+
         {/* Quick Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
           {[
@@ -187,14 +192,22 @@ export const AmbulanceDashboard = ({ user, onNavigate, onLogout }: AmbulanceDash
               <div>
                 <h4 className="font-semibold text-orange-800">Emergency Protocol</h4>
                 <p className="text-sm text-orange-700 mt-1">
-                  Voice recording is available for hands-free operation. Simply press the mic button and speak your destination details. 
-                  The system will automatically fill the information and start route optimization.
+                  Use the AI chatbot (bottom-right) for hands-free operation. Say "Patient critical" to alert hospitals, 
+                  "Need backup" for police, or ask about nearest ICU availability.
                 </p>
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
+
+      {/* Driver Chatbot */}
+      <DriverChatbot 
+        vehicleId={vehicleId || undefined}
+        driverName={user.name}
+        currentLat={13.5550}
+        currentLng={78.8738}
+      />
     </div>
   );
 };
