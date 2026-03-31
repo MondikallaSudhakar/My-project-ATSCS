@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Ambulance, MapPin, Hospital, LogOut, Activity, Clock } from "lucide-react";
 import { User, AppPage } from "@/pages/Index";
+import { DriverChatbot } from "@/components/DriverChatbot";
+import { LiveAmbulanceMap } from "@/components/LiveAmbulanceMap";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AmbulanceDashboardProps {
   user: User;
