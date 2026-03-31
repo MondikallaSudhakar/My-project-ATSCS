@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Ambulance, MapPin, Hospital, LogOut, Activity, Clock } from "lucide-react";
 import { User, AppPage } from "@/pages/Index";
+import { DriverChatbot } from "@/components/DriverChatbot";
+import { LiveAmbulanceMap } from "@/components/LiveAmbulanceMap";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AmbulanceDashboardProps {
   user: User;
@@ -13,6 +16,24 @@ interface AmbulanceDashboardProps {
 
 export const AmbulanceDashboard = ({ user, onNavigate, onLogout }: AmbulanceDashboardProps) => {
   const [status, setStatus] = useState<"available" | "on-duty">("available");
+  const [vehicleId, setVehicleId] = useState<string | null>(null);
+
+  // Register vehicle in Supabase on mount
+  useEffect(() => {
+    const registerVehicle = async () => {
+      const { data, error } = await supabase.from("vehicles").insert({
+        driver_name: user.name,
+        vehicle_number: user.vehicleNumber || "AP01-AB-1234",
+        status: "available",
+        current_lat: 13.5550,
+        current_lng: 78.8738,
+      }).select().single();
+
+      if (data) setVehicleId(data.id);
+      if (error) console.error("Vehicle register error:", error);
+    };
+    registerVehicle();
+  }, [user.name, user.vehicleNumber]);
 
   return (
     <div className="min-h-screen bg-background p-4">
@@ -139,6 +160,11 @@ export const AmbulanceDashboard = ({ user, onNavigate, onLogout }: AmbulanceDash
           </Card>
         </div>
 
+        {/* Live Ambulance Map */}
+        <div className="mt-6">
+          <LiveAmbulanceMap vehicleId={vehicleId || undefined} isEmergency={true} />
+        </div>
+
         {/* Quick Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
           {[
@@ -166,14 +192,22 @@ export const AmbulanceDashboard = ({ user, onNavigate, onLogout }: AmbulanceDash
               <div>
                 <h4 className="font-semibold text-orange-800">Emergency Protocol</h4>
                 <p className="text-sm text-orange-700 mt-1">
-                  Voice recording is available for hands-free operation. Simply press the mic button and speak your destination details. 
-                  The system will automatically fill the information and start route optimization.
+                  Use the AI chatbot (bottom-right) for hands-free operation. Say "Patient critical" to alert hospitals, 
+                  "Need backup" for police, or ask about nearest ICU availability.
                 </p>
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
+
+      {/* Driver Chatbot */}
+      <DriverChatbot 
+        vehicleId={vehicleId || undefined}
+        driverName={user.name}
+        currentLat={13.5550}
+        currentLng={78.8738}
+      />
     </div>
   );
 };
