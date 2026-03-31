@@ -16,6 +16,24 @@ interface AmbulanceDashboardProps {
 
 export const AmbulanceDashboard = ({ user, onNavigate, onLogout }: AmbulanceDashboardProps) => {
   const [status, setStatus] = useState<"available" | "on-duty">("available");
+  const [vehicleId, setVehicleId] = useState<string | null>(null);
+
+  // Register vehicle in Supabase on mount
+  useEffect(() => {
+    const registerVehicle = async () => {
+      const { data, error } = await supabase.from("vehicles").insert({
+        driver_name: user.name,
+        vehicle_number: user.vehicleNumber || "AP01-AB-1234",
+        status: "available",
+        current_lat: 13.5550,
+        current_lng: 78.8738,
+      }).select().single();
+
+      if (data) setVehicleId(data.id);
+      if (error) console.error("Vehicle register error:", error);
+    };
+    registerVehicle();
+  }, [user.name, user.vehicleNumber]);
 
   return (
     <div className="min-h-screen bg-background p-4">
