@@ -14,7 +14,167 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      backup_requests: {
+        Row: {
+          created_at: string
+          id: string
+          lat: number | null
+          lng: number | null
+          location: string | null
+          status: string
+          vehicle_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          location?: string | null
+          status?: string
+          vehicle_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          location?: string | null
+          status?: string
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "backup_requests_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hospital_notifications: {
+        Row: {
+          ambulance_id: string | null
+          condition: string | null
+          created_at: string
+          eta: string | null
+          hospital_id: string | null
+          id: string
+          message: string | null
+          status: string
+        }
+        Insert: {
+          ambulance_id?: string | null
+          condition?: string | null
+          created_at?: string
+          eta?: string | null
+          hospital_id?: string | null
+          id?: string
+          message?: string | null
+          status?: string
+        }
+        Update: {
+          ambulance_id?: string | null
+          condition?: string | null
+          created_at?: string
+          eta?: string | null
+          hospital_id?: string | null
+          id?: string
+          message?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hospital_notifications_ambulance_id_fkey"
+            columns: ["ambulance_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hospital_notifications_hospital_id_fkey"
+            columns: ["hospital_id"]
+            isOneToOne: false
+            referencedRelation: "hospitals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hospitals: {
+        Row: {
+          created_at: string
+          emergency_open: boolean
+          icu_available: boolean
+          id: string
+          lat: number
+          lng: number
+          name: string
+          phone: string | null
+          speciality: string | null
+        }
+        Insert: {
+          created_at?: string
+          emergency_open?: boolean
+          icu_available?: boolean
+          id?: string
+          lat: number
+          lng: number
+          name: string
+          phone?: string | null
+          speciality?: string | null
+        }
+        Update: {
+          created_at?: string
+          emergency_open?: boolean
+          icu_available?: boolean
+          id?: string
+          lat?: number
+          lng?: number
+          name?: string
+          phone?: string | null
+          speciality?: string | null
+        }
+        Relationships: []
+      }
+      vehicles: {
+        Row: {
+          created_at: string
+          current_lat: number | null
+          current_lng: number | null
+          destination: string | null
+          driver_name: string
+          id: string
+          route_coords: Json | null
+          status: string
+          updated_at: string
+          vehicle_number: string | null
+        }
+        Insert: {
+          created_at?: string
+          current_lat?: number | null
+          current_lng?: number | null
+          destination?: string | null
+          driver_name: string
+          id?: string
+          route_coords?: Json | null
+          status?: string
+          updated_at?: string
+          vehicle_number?: string | null
+        }
+        Update: {
+          created_at?: string
+          current_lat?: number | null
+          current_lng?: number | null
+          destination?: string | null
+          driver_name?: string
+          id?: string
+          route_coords?: Json | null
+          status?: string
+          updated_at?: string
+          vehicle_number?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
